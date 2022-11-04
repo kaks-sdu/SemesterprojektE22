@@ -1,7 +1,7 @@
 version: "3.9"
 
 services:
-  namenode:
+  hadoop_namenode:
     image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
     container_name: namenode
     restart: always
@@ -9,14 +9,14 @@ services:
       - 9870:9870
       - 9000:9000
     volumes:
-      - ./stream-in:/stream-in
+      - ./data/hadoop/stream:/stream
       - hadoop_namenode:/hadoop/dfs/name
     environment:
       - CLUSTER_NAME=test
     env_file:
       - ./hadoop.env
 
-  datanode1:
+  hadoop_datanode1:
     image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
     container_name: datanode1
     restart: always
@@ -29,7 +29,7 @@ services:
     env_file:
       - ./hadoop.env
 
-  datanode2:
+  hadoop_datanode2:
     image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
     container_name: datanode2
     restart: always
@@ -42,7 +42,7 @@ services:
     env_file:
       - ./hadoop.env
 
-  datanode3:
+  hadoop_datanode3:
     image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
     container_name: datanode3
     restart: always
@@ -128,10 +128,10 @@ services:
 
 
 volumes:
-  hadoop_namenode:
-  hadoop_datanode1:
-  hadoop_datanode2:
-  hadoop_datanode3:
+  hadoop_namenode: ./data/hadoop/namenode
+  hadoop_datanode1: ./data/hadoop/data1
+  hadoop_datanode2: ./data/hadoop/data2
+  hadoop_datanode3: ./data/hadoop/data3
 
 networks:
   default:
