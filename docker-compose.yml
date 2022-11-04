@@ -10,7 +10,7 @@ services:
       - 9000:9000
     volumes:
       - ./data/hadoop/stream:/stream
-      - hadoop_namenode:/hadoop/dfs/name
+      - ./data/hadoop/namemode:/hadoop/dfs/name
     environment:
       - CLUSTER_NAME=test
     env_file:
@@ -21,7 +21,7 @@ services:
     container_name: datanode1
     restart: always
     volumes:
-      - hadoop_datanode1:/hadoop/dfs/data
+      - ./data/hadoop/data1:/hadoop/dfs/data
     ports:
       - 9864:9864
     environment:
@@ -34,7 +34,7 @@ services:
     container_name: datanode2
     restart: always
     volumes:
-      - hadoop_datanode2:/hadoop/dfs/data
+      - ./data/hadoop/data2:/hadoop/dfs/data
     ports:
       - 9865:9864
     environment:
@@ -47,7 +47,7 @@ services:
     container_name: datanode3
     restart: always
     volumes:
-      - hadoop_datanode3:/hadoop/dfs/data
+      - ./data/hadoop/data3:/hadoop/dfs/data
     ports:
       - 9866:9864
     environment:
@@ -125,13 +125,6 @@ services:
     build: ./flume
     volumes:
       - ./source:/logs
-
-
-volumes:
-  hadoop_namenode: ./data/hadoop/namenode
-  hadoop_datanode1: ./data/hadoop/data1
-  hadoop_datanode2: ./data/hadoop/data2
-  hadoop_datanode3: ./data/hadoop/data3
 
 networks:
   default:
