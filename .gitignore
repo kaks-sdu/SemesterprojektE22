@@ -1,4 +1,10 @@
-
 .DS_Store
 ./data/
 ./source/
+bin/
+obj/
+/.idea/
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+/data/
