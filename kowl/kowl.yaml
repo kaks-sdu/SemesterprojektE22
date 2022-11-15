@@ -1,0 +1,8 @@
+kafka:
+  brokers:
+    - kafka:9092
+connect:
+  enabled: true
+  clusters:
+    - name: kafka-connect-to-hdfs
+      url: http://kafka-connect:8083

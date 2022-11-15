@@ -1,6 +1,10 @@
 .DS_Store
 ./data/
 ./source/
+data/kafka/
+data/
+source/
+
 bin/
 obj/
 /.idea/

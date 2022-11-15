@@ -8,9 +8,9 @@ services:
     ports:
       - 9870:9870
       - 9000:9000
-    volumes:
-      - ./data/hadoop/stream:/stream
-      - ./data/hadoop/namemode:/hadoop/dfs/name
+    #volumes:
+    #  - ./data/hadoop/stream:/stream
+    #  - ./data/hadoop/namemode:/hadoop/dfs/name
     environment:
       - CLUSTER_NAME=test
     env_file:
@@ -20,8 +20,8 @@ services:
     image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
     container_name: datanode1
     restart: always
-    volumes:
-      - ./data/hadoop/data1:/hadoop/dfs/data
+    #volumes:
+    #  - ./data/hadoop/data1:/hadoop/dfs/data
     ports:
       - 9864:9864
     environment:
@@ -33,8 +33,8 @@ services:
     image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
     container_name: datanode2
     restart: always
-    volumes:
-      - ./data/hadoop/data2:/hadoop/dfs/data
+    #volumes:
+    #  - ./data/hadoop/data2:/hadoop/dfs/data
     ports:
       - 9865:9864
     environment:
@@ -46,8 +46,8 @@ services:
     image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
     container_name: datanode3
     restart: always
-    volumes:
-      - ./data/hadoop/data3:/hadoop/dfs/data
+    #volumes:
+    #  - ./data/hadoop/data3:/hadoop/dfs/data
     ports:
       - 9866:9864
     environment:
@@ -62,6 +62,9 @@ services:
     restart: unless-stopped
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
+    volumes: 
+      - ./data/zookeeper/data:/var/lib/zookeeper/data
+      - ./data/zookeeper/logs:/var/lib/zookeeper/log
 
   kafka:
     image: confluentinc/cp-kafka:7.2.1
@@ -76,9 +79,47 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_PARTITION_ASSIGNMENT_STRATEGY: org.apache.kafka.clients.consumer.RoundRobinAssignor
+    volumes:
+      - ./data/kafka:/var/lib/kafka/data
     restart: unless-stopped
     depends_on:
       - zookeeper
+
+  kafka-connect:
+    build: ./kafka-connect
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: kafka:9092
+      CONNECT_GROUP_ID: "default"
+      CONNECT_CONFIG_STORAGE_TOPIC: "default.config"
+      CONNECT_OFFSET_STORAGE_TOPIC: "default.offsets"
+      CONNECT_STATUS_STORAGE_TOPIC: "default.status"
+      CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.storage.StringConverter"
+      CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.storage.StringConverter"
+      CONNECT_REST_ADVERTISED_HOST_NAME: "kafka-connect"
+      CONNECT_PLUGIN_PATH: "/usr/share/java,/usr/share/confluent-hub-components"
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8085"
+      CONNECT_REST_PORT: 8083
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "1"
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "1"
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "1"
+    depends_on:
+      - kafka
+      - zookeeper
+#      - schema-registry
+#    volumes:
+#      - ./kafka-connect:/usr/share/confluent-hub-components
+#      - ./kafka-connect/jars:/usr/share/java
+    ports:
+      - "8083:8083"
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.2.1
+    ports:
+      - 8085:8085
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka:9092'
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8083
 
   kowl:
     image: quay.io/cloudhut/kowl:master # We use the master tag as we want to use the latest features e.g. creation of topics.
@@ -88,8 +129,10 @@ services:
     depends_on:
       - zookeeper
       - kafka
-    environment:
-      KAFKA_BROKERS: kafka:9092
+      - kafka-connect
+    entrypoint: ["./kowl", "--config.filepath=/etc/kowl/config.yaml"]
+    volumes:
+      - ./kowl/kowl.yaml:/etc/kowl/config.yaml
 
   spark-master:
     image: bde2020/spark-master:3.3.0-hadoop3.3
@@ -120,11 +163,49 @@ services:
     environment:
       - "SPARK_MASTER=spark://spark-master:7077"
 
-
   flume:
     build: ./flume
     volumes:
       - ./source:/logs
+
+  hive-server:
+    image: bde2020/hive:2.3.2-postgresql-metastore
+    env_file:
+      - ./hadoop-hive.env
+    #command: /usr/local/bin/startup.sh && hive -f hive_table_setup.hql
+    #command: sh -c "hive -f hive_table_setup.hql && exec /usr/local/bin/startup.sh"
+    volumes:
+      - ./json-serde-1.3.8-jar-with-dependencies.jar:/opt/hive/lib/json-serde-1.3.8-jar-with-dependencies.jar
+      - ./json-udf-1.3.8-jar-with-dependencies.jar:/opt/hive/lib/json-udf-1.3.8-jar-with-dependencies.jar
+      - ./hive-docker/hive_table_setup.hql:/opt/hive_table_setup.hql
+    environment:
+      HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: "jdbc:postgresql://hive-metastore/metastore"
+      SERVICE_PRECONDITION: "hive-metastore:9083"
+    ports:
+      - "10000:10000"
+
+  hive-metastore:
+    image: bde2020/hive:2.3.2-postgresql-metastore
+    env_file:
+      - ./hadoop-hive.env
+    command: /opt/hive/bin/hive --service metastore
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870 hive-metastore-postgresql:5432"
+    ports:
+      - "9083:9083"
+
+  hive-metastore-postgresql:
+    build: 
+      context: ./hive-docker
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      
+  presto-coordinator:
+    image: shawnzhu/prestodb:0.181
+    ports:
+      - "8001:8080"
+
 
 networks:
   default:
