@@ -28,10 +28,11 @@ This will make a source folder. The source folder is where Flume takes the files
        "topics": "events",
        "hdfs.url": "hdfs://namenode:9000/stream/",
        "format.class": "io.confluent.connect.hdfs.string.StringFormat",
-       "flush.size": 1
+       "flush.size": 100
    }
 
    ```
+Flush size can be changed. It indicates how many lines are put into each file in the HDFS. Ideally it should match the block size of the HDFS cluster such that a balance is reached. Set it as a low number for now.
 
 Setup Hive (must be done every time there is a restart):
 
