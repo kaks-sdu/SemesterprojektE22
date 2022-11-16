@@ -36,8 +36,11 @@ Flush size can be changed. It indicates how many lines are put into each file in
 
 Setup Hive (must be done every time there is a restart):
 
-1. Enter the hive container with ```docker exec -it <container_id or name of hive_server> /bin/bash```
-2. Run ```hive -f hive_table_setup.hql```
+1. Find the id of the hive container
+   1. For Windows: `docker ps | findstr "hive-server"`
+   2. For Linux: `docker ps | grep "hive-server"`
+2. Enter the hive container with `docker exec -it <container_id or name of hive_server> /bin/bash`
+3. Run `hive -f hive_table_setup.hql`
 
 
 After this, everything should be setup. To run queries on the data that comes through the source folder, you will need to make sure that you specify ```USE DATABASE semester_project```. The table is called ```push_events```.
