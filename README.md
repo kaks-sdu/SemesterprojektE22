@@ -80,3 +80,14 @@ If given audio that transcribes to "what is the top comment?" the response will 
 }
 ```
 Showing both the transcribed text from the audio data, the question that is most closely a match, the index (starting at 0), and the similarity between the transcribed text vs. the best question.
+
+## Useful ports
+- 3000 - Speech interface
+- 8000 - Kowl Web interface
+- 9870 - Web HDFS
+- 8080 - Spark web interface
+- 9000 - Hadoop connect
+- 9092 - Kafka
+- 7077 - Spark (possible to be removed)
+- 8001 - Presto web interface (to check Hive speeds etc.)
+- 10000 - Hive
