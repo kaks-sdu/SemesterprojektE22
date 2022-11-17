@@ -21,7 +21,7 @@ This will make a source folder. The source folder is where Flume takes the files
 
    ```json
    {
-       "name": “kafka-to-hdfs”,
+       "name": "kafka-to-hdfs",
        "connector.class": "io.confluent.connect.hdfs.HdfsSinkConnector",
        "tasks.max": 3,
        "key.converter": "org.apache.kafka.connect.storage.StringConverter",
@@ -50,3 +50,33 @@ Data should automatically be published into the table after it is pushed through
 ## How to test
 
 Upload the json files into the source folder and it should be automatically put into the Kafka topic 'events' and moved to the stream folder of the HDFS
+
+## How to use speech interface 
+The speech interface can be found on port 3000. It accepts a `POST` request to the `/transcribe` endpoint with a body parameter called audio_data that accepts audio data.
+
+The settings.json located in the speech-interface folder contains the possible questions that are matched from the audio data:
+
+```json
+{
+    "model_size": "base",
+    "language": "english",
+    "semantic_model": "all-MiniLM-L6-v2",
+    "questions": [
+        "how many push requests are there",
+        "what are the top comments"
+    ]
+}
+```
+To add new questions simply add them there.
+
+If given audio that transcribes to "what is the top comment?" the response will be:
+
+```json
+{
+  "transcribed_text": "What is the top comment?",
+  "best_question": "what are the top comments",
+  "best_question_index": 1,
+  "best_score": 0.8937845230102539
+}
+```
+Showing both the transcribed text from the audio data, the question that is most closely a match, the index (starting at 0), and the similarity between the transcribed text vs. the best question.

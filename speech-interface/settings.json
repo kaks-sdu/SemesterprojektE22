@@ -1,0 +1,9 @@
+{
+    "model_size": "base",
+    "language": "english",
+    "semantic_model": "all-MiniLM-L6-v2",
+    "questions": [
+        "how many push requests are there",
+        "what are the top comments"
+    ]
+}
