@@ -77,9 +77,9 @@ def transcribe():
 
         json_response = {
             "transcribed_text": transcribed_text.strip(),
-            "best_question": best_question,
-            "best_question_index": index,
-            "best_score": best_score.item()
+            "question": best_question,
+            "index": index,
+            "score": best_score.item()
         }
 
         return json.dumps(json_response)

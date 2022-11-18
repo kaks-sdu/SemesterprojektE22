@@ -74,9 +74,9 @@ If given audio that transcribes to "what is the top comment?" the response will 
 ```json
 {
   "transcribed_text": "What is the top comment?",
-  "best_question": "what are the top comments",
-  "best_question_index": 1,
-  "best_score": 0.8937845230102539
+  "question": "what are the top comments",
+  "index": 1,
+  "score": 0.8937845230102539
 }
 ```
 Showing both the transcribed text from the audio data, the question that is most closely a match, the index (starting at 0), and the similarity between the transcribed text vs. the best question.
