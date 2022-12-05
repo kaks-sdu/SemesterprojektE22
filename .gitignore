@@ -13,4 +13,5 @@ riderModule.iml
 /_ReSharper.Caches/
 /data/
 /speech-interface/venv/
+/speech-interface/.env/
 speech-interface/__pycache__/

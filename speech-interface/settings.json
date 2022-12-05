@@ -3,7 +3,9 @@
     "language": "english",
     "semantic_model": "all-MiniLM-L6-v2",
     "questions": [
-        "how many push requests are there",
-        "what are the top comments"
+        "which repositories receive the most updates",
+        "what are the top messages",
+        "who are the top authors",
+        "how long are push requests messages on average"
     ]
 }
