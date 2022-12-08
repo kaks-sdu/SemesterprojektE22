@@ -2,3 +2,7 @@ flask
 flask_cors
 git+https://github.com/openai/whisper.git
 sentence-transformers
+sasl
+thrift
+thrift-sasl
+PyHive

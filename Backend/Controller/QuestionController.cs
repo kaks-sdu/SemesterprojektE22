@@ -18,7 +18,7 @@ public class QuestionController
     [HttpPost]
     public async Task<AnswerDto> AskQuestion([FromBody] QuestionDto question)
     {
-        var answer = await _questionService.AskQuestion(question.Question);
-        return new AnswerDto { Answer = answer };
+       var answer = await _questionService.AskQuestion("You you doing?");
+        return new AnswerDto { Answer = "asd" };
     }
 }

@@ -1,4 +1,11 @@
 {
+    "database": {
+        "host": "host.docker.internal",
+        "database": "metastore",
+        "user": "hive",
+        "password": "hive",
+        "port": 10000
+    },
     "model_size": "base",
     "language": "english",
     "semantic_model": "all-MiniLM-L6-v2",

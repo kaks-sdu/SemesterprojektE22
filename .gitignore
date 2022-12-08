@@ -15,3 +15,4 @@ riderModule.iml
 /speech-interface/venv/
 /speech-interface/.env/
 speech-interface/__pycache__/
+.vs

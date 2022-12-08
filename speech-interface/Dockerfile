@@ -6,6 +6,7 @@ WORKDIR /app
 
 COPY . .
 
+RUN apt-get install sasl2-bin libsasl2-2 libsasl2-dev libsasl2-modules -y
 RUN pip install --trusted-host pypi.python.org -r requirements.txt
 
 EXPOSE 3000
