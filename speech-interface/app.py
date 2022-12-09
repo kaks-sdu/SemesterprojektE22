@@ -12,8 +12,6 @@ app = flask.Flask(__name__)
 CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-conn = None
-
 def load_settings():
     '''
     Load settings from settings.txt
@@ -36,8 +34,9 @@ def setup_db(settings):
     print('Setting up database connection')
     #establishing the connection
     print(settings)
-    conn = hive.Connection(settings['host'], port=settings['port'], username=settings['user'])
+    conn = hive.Connection(settings['host'], port=settings['port'], username=settings['user'], database= settings['database'])
     print('Successfully setup database connection')
+    return conn
 
 def load_models(settings):
     '''
@@ -96,11 +95,11 @@ def transcribe_file(save_path):
 def evalute_question(question):
     querry = None
     if (question == "which repositories receive the most updates"):
-        querry = "SELECT repo.name, COUNT(payload.commits) AS count FROM push_events GROUP BY repo.name ORDER BY count DESC LIMIT 10; "
+        querry = "SELECT repo.name, COUNT(payload.commits) AS count FROM push_events GROUP BY repo.name ORDER BY count DESC LIMIT 10"
     elif (question == "what are the top messages"):
-        querry = "SELECT payload.commits.message, COUNT(*) AS count FROM push_events GROUP BY payload.commits.message ORDER BY count DESC LIMIT 25;"
+        querry = "SELECT payload.commits.message, COUNT(*) AS count FROM push_events GROUP BY payload.commits.message ORDER BY count DESC LIMIT 25"
     elif (question == "who are the top authors"):
-        querry = "SELECT payload.commits.author.name, COUNT(*) AS count FROM push_events GROUP BY payload.commits.author.name ORDER BY count DESC LIMIT 25;"
+        querry = "SELECT payload.commits.author.name, COUNT(*) AS count FROM push_events GROUP BY payload.commits.author.name ORDER BY count DESC LIMIT 25"
     elif (question == "how long are push requests messages on average"):
         raise Exception("Could not generate querry")
 
@@ -147,6 +146,6 @@ def transcribe():
 if __name__ == '__main__':
     print('Starting service')
     settings = load_settings()
-    setup_db(settings['database'])
+    conn = setup_db(settings['database'])
     whisper_model, semantic_model = load_models(settings)
     app.run(host='0.0.0.0', port=3000)
