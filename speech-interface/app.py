@@ -96,7 +96,7 @@ def evalute_question(question):
     querry = None
     if (question == "which repositories receive the most updates"):
         querry = "SELECT repo.name, COUNT(payload.commits) AS count FROM push_events GROUP BY repo.name ORDER BY count DESC LIMIT 10"
-    elif (question == "what are the top messages"):
+    elif (question == "what are the top messages" or question == "what are the top comments"):
         querry = "SELECT payload.commits.message, COUNT(*) AS count FROM push_events GROUP BY payload.commits.message ORDER BY count DESC LIMIT 25"
     elif (question == "who are the top authors"):
         querry = "SELECT payload.commits.author.name, COUNT(*) AS count FROM push_events GROUP BY payload.commits.author.name ORDER BY count DESC LIMIT 25"
@@ -106,14 +106,14 @@ def evalute_question(question):
     if (querry == None):
         raise Exception("Unknown question")
 
-    #if True:
-    #    return querry
-
     cursor = conn.cursor()
     cursor.execute(querry)
-    print(cursor.fetchone())
+    result = cursor.fetchone()
+
+    cursor.close()
+    print(result)
     # print(cursor.fetchall())
-    return cursor.fetchone()
+    return result
     
 
 @app.route('/transcribe', methods=['POST'])
