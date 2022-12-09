@@ -12,6 +12,7 @@
     "questions": [
         "which repositories receive the most updates",
         "what are the top messages",
+        "what are the top comments",
         "who are the top authors",
         "how long are push requests messages on average"
     ]
