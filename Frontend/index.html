@@ -21,13 +21,45 @@
 <body>
     <div class="center">
 <h1>Select audio file</h1>
-<input type="file" name="my_file" id="my-file">
+<input type="file" name="my_file" id="my-file" onchange="transcribe(this)">
 
 <br/>
 <h1>Result</h1>
-<span><b>Question:</b></span> <p class="question">Hvor mange øl kan Have drikke på lørdag?</p>
-<span><b>Answer:</b></span> <p class="answer">1, for han er en fucktard der skal være chauffør</p>
+<span><b>Question:</b></span> <p id="question">Please upload a question</p>
+<span><b>Answer:</b></span> <p id="answer">Please upload a question</p>
 </div>
 </body>
 
 </html>
+
+<script>
+
+function transcribe(input) {
+  let file = document.getElementById("my-file").files[0];
+  let formData = new FormData();
+  
+  document.getElementById("question").innerHTML = "Loading... Please wait...";
+  document.getElementById("answer").innerHTML = "Loading... Please wait...";
+
+  console.log("starting...")
+     
+  formData.append("audio_data", file);
+
+  const start = new Date()
+  var end = null
+  fetch('http://localhost:3000/transcribe', {method: "POST", body: formData})
+  .then(response => {
+    end = new Date()
+    return response.text();
+  })
+  .then(res => {
+
+    console.log(end - start)
+    let json = JSON.parse(res)
+    document.getElementById("question").innerHTML = json.question;
+    document.getElementById("answer").innerHTML = json.answer;
+  });
+}
+
+
+</script>
